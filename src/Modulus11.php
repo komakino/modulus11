@@ -21,11 +21,12 @@ class Modulus11
             $sum    += ($sequence[$i] * $factor);
         }
 
-        $calculus = 11 - $sum % 11;
+        $remainder = $sum % 11;
 
-        switch($calculus){
-            case 10: return 'X';
-            default: return $calculus;
+        switch($remainder){
+            case 0: return 0;
+            case 1: return 'X';
+            default: return 11 - $remainder;
         }
     }
 

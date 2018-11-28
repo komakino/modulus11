@@ -6,34 +6,46 @@ use Komakino\Modulus11\Modulus11;
 
 class Mod11Test extends \PHPUnit_Framework_TestCase
 {
-    protected $withCheckDigit1    = '1234.56.78903';
-    protected $withoutCheckDigit1 = '1234.56.7890';
-    protected $theCheckDigit1     = 3;
 
-    protected $withCheckDigit2    = '036522X';
-    protected $withoutCheckDigit2 = '036522';
-    protected $theCheckDigit2     = 'X';
-
-    public function testValidate()
+    public function provideValues()
     {
-        $this->assertTrue(Modulus11::validate($this->withCheckDigit1));
-        $this->assertTrue(Modulus11::validate($this->withCheckDigit2));
+        return array(
+            array('1234.56.78903', '1234.56.7890', 3),
+            array('036522X', '036522', 'X'),
+            array('01010104900', '0101010490', 0)
+        );
     }
 
-    public function testCalculate()
+    /**
+     * @param string $withCheckDigit
+     * @dataProvider provideValues
+     */
+    public function testValidate($withCheckDigit)
     {
-        $this->assertSame($this->theCheckDigit1, Modulus11::calculate($this->withoutCheckDigit1));
-        $this->assertSame($this->theCheckDigit2, Modulus11::calculate($this->withoutCheckDigit2));
+        $this->assertTrue(Modulus11::validate($withCheckDigit));
     }
 
-    public function testAppendCheckDigit()
+    /**
+     * @param string $withCheckDigit
+     * @param string $withoutCheckDigit
+     * @param string|int $checkDigit
+     * @dataProvider provideValues
+     */
+    public function testCalculate($withCheckDigit, $withoutCheckDigit, $checkDigit)
     {
-        $appended = Modulus11::appendCheckDigit($this->withoutCheckDigit1);
-        $this->assertSame($this->withoutCheckDigit1.$this->theCheckDigit1, $appended);
-        $this->assertTrue(Modulus11::validate($appended));
+        $this->assertSame($checkDigit, Modulus11::calculate($withoutCheckDigit));
+    }
 
-        $appended = Modulus11::appendCheckDigit($this->withoutCheckDigit2);
-        $this->assertSame($this->withoutCheckDigit2.$this->theCheckDigit2, $appended);
+    /**
+     * @param string $withCheckDigit
+     * @param string $withoutCheckDigit
+     * @param string|int $checkDigit
+     * @dataProvider provideValues
+     */
+    public function testAppendCheckDigit($withCheckDigit, $withoutCheckDigit, $checkDigit)
+    {
+        $appended = Modulus11::appendCheckDigit($withoutCheckDigit);
+        $this->assertSame($withoutCheckDigit . $checkDigit, $appended);
         $this->assertTrue(Modulus11::validate($appended));
     }
 
